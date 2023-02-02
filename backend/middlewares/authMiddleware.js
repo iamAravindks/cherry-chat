@@ -4,7 +4,8 @@ import config from "../config.js";
 import User from "../models/userModel.js";
 
 export const isAuth = expressAsyncHandler(async (req, res, next) => {
-  const token = req.cookies.access_token;
+  
+  const token = req.cookies[config.AUTH_COOKIE];
   if (token) {
     try {
       const decodedObj = jwt.verify(

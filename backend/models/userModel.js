@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
-import crypto from "crypto";
 import isEmail from "validator/lib/isEmail.js";
 
 const UserSchema = new mongoose.Schema(
@@ -17,7 +16,7 @@ const UserSchema = new mongoose.Schema(
     picture: {
       type: String,
       default:
-        "https://res.cloudinary.com/dlgosw3g3/image/upload/v1674915681/default_oowvxm.svg",
+        "https://res.cloudinary.com/dlgosw3g3/image/upload/v1675270823/default_ilxi6n.png",
     },
     newMessages: {
       type: Object,
@@ -27,9 +26,8 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "online",
     },
-
   },
-  { minimize: false }
+  { minimize: false, versionKey: "__v" }
 );
 
 

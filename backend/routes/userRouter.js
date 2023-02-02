@@ -3,6 +3,7 @@ import expressAsyncHandler from "express-async-handler";
 import { isAuth } from "../middlewares/authMiddleware.js";
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import config from '../config.js'
 const userRouter = express.Router();
 
 // @desc Auth user & get token
@@ -20,7 +21,7 @@ userRouter.post(
     if (user && (await user.matchPassword(password))) {
       const maxAge = 3 * 24 * 60 * 60;
       const token = generateToken(user._id);
-      res.cookie("access_token", token, {
+      res.cookie(config.AUTH_COOKIE, token, {
         httpOnly: true,
         maxAge: maxAge * 1000,
       });
@@ -70,7 +71,7 @@ userRouter.post(
     if (user) {
       const maxAge = 3 * 24 * 60 * 60;
       const token = generateToken(user._id);
-      res.cookie("access_token", token, {
+      res.cookie(config.AUTH_COOKIE, token, {
         httpOnly: true,
         maxAge: maxAge * 1000,
       });
@@ -99,7 +100,7 @@ userRouter.put(
 
       const maxAge = 3 * 24 * 60 * 60;
       const token = generateToken(updatedUser._id);
-      res.cookie("access_token", token, {
+      res.cookie(config.AUTH_COOKIE, token, {
         httpOnly: true,
         maxAge: maxAge * 1000,
       });
@@ -112,6 +113,25 @@ userRouter.put(
     } else {
       res.status(404).json({ message: "user doesn't found" });
     }
+  })
+);
+
+// @desc User logout
+// @route /api/users/logout
+// @access PRIVATE
+
+userRouter.delete(
+  "/logout",
+  expressAsyncHandler(async (req, res) => {
+    const token = generateToken(
+      Math.floor(Math.random() * (1000000 - 100000) + 100000));
+    res.cookie(config.AUTH_COOKIE, token, {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.json({
+      message: "successfully logout in",
+    });
   })
 );
 

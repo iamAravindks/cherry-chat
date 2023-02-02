@@ -9,7 +9,7 @@ const appApi = createApi({
     headers: {
       "Content-Type": "application/json",
     },
-    credentials:"include"
+    credentials: "include",
   }),
   endpoints: (builder) => ({
     //creating the user
@@ -33,8 +33,11 @@ const appApi = createApi({
 
     // get the profile
 
-    profileUser: builder.query({
-      query: () => "/users/profile",
+    profileUser: builder.mutation({
+      query: () => ({
+        url: "/users/profile",
+        method: "GET",
+      }),
     }),
 
     // logout a user
@@ -49,5 +52,5 @@ const appApi = createApi({
 });
 
 
-export const { useLoginUserMutation, useSignUpUserMutation, useLogoutMutation ,useProfileUserQuery} = appApi
+export const { useLoginUserMutation, useSignUpUserMutation, useLogoutMutation ,useProfileUserMutation} = appApi
 export default appApi

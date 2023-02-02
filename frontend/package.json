@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy":"http://localhost:5000",
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.2",
     "@testing-library/jest-dom": "^5.16.5",
@@ -17,8 +17,10 @@
     "react-scripts": "^5.0.1",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
+    "redux-persist-cookie-storage": "^1.0.0",
     "redux-thunk": "^2.4.2",
     "socket.io-client": "^4.5.4",
+    "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

@@ -4,9 +4,8 @@ import appApi from "./services/appApi";
 
 // persisting the store
 
-import {  persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
 import thunk from "redux-thunk";
+
 
 
 
@@ -18,22 +17,14 @@ const reducers = combineReducers({
 
 
 
-const persistConfig = {
-  key: "x-root-chatAPP",
-  storage,
-  whitelist: ["user"],
-  // stateReconciler: (inboundState, originalState) => {
-  //   return { user: { _id: inboundState.user._id || null} };
-  // },
-};
+
 
 
 // persist our store
 
-const persistedReducer = persistReducer(persistConfig, reducers);
 
 const store = configureStore({
-  reducer: persistedReducer,
+  reducer: reducers,
   middleware: [thunk, appApi.middleware],
 });
 
