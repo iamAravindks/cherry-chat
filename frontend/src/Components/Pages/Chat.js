@@ -12,6 +12,7 @@ import {
   socket,
 } from "../../features/messageSlice";
 import { addNotifications, resetNotifications } from "../../features/userSlice";
+import JoinRoom from "../JoinRoom";
 
 const Chat = () => {
   const dispatch = useDispatch();
@@ -68,6 +69,7 @@ const Chat = () => {
           </div>
         </div>
         <ul className="pt-6">
+          <JoinRoom/>
           <h3 className="text-md font-bold text-white">
             Rooms({rooms.length})
           </h3>
