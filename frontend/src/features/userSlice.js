@@ -16,15 +16,27 @@ export const userSlice = createSlice({
     _id: null,
   },
   reducers: {
-    addNotifications: (state, { payload }) => {},
-    resetNotifications: (state, { payload }) => {},
+    addNotifications: (state, { payload }) => {
+      if (state.newMessages[payload]) state.newMessages[payload] += 1;
+      else state.newMessages[payload] = 1;
+    },
+    resetNotifications: (state, { payload }) =>
+    {
+      delete state.newMessages[payload]
+    },
     clearError: (state) => {
       state.error = null;
       state.loading = false;
     },
+    setError: (state, { payload }) => {
+      state.error = payload;
+    },
     loadID: (state) => {
       state._id =
         JSON.parse(localStorage.getItem("cherry-chat-status")) || null;
+    },
+    setLoading: (state, { payload }) => {
+      state.loading = payload;
     },
   },
   extraReducers: (builder) => {
@@ -36,6 +48,7 @@ export const userSlice = createSlice({
         return { ...state, loading: false, error: null, ...payload };
       }
     );
+
     builder.addMatcher(
       appApi.endpoints.loginUser.matchFulfilled,
       (state, { payload }) => {
@@ -75,7 +88,13 @@ export const userSlice = createSlice({
   },
 });
 
-export const { addNotifications, resetNotifications, clearError, loadID } =
-  userSlice.actions;
+export const {
+  addNotifications,
+  resetNotifications,
+  clearError,
+  loadID,
+  setError,
+  setLoading,
+} = userSlice.actions;
 
 export default userSlice.reducer;

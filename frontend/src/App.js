@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
@@ -9,6 +10,7 @@ import { Home } from "./Components/Pages/Home";
 import Login from "./Components/Pages/Login";
 import Signup from "./Components/Pages/Signup";
 import PrivateRouteWrapper from "./Components/PrivateRouteWrapper";
+import { addMembers, socket } from "./features/messageSlice";
 import { loadID } from "./features/userSlice";
 import { useProfileUserMutation } from "./services/appApi";
 
@@ -27,8 +29,13 @@ const App = (props) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(loadID());
-    if (user._id !== null) profileUser();
-  }, []);
+    if (user._id) {
+      profileUser();
+      socket.off("new-user").on("new-user", (payload) => {
+        dispatch(addMembers(payload));
+      });
+    }
+  }, [user._id]);
   return (
     <div>
       <Loader />

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import { BiLogInCircle } from 'react-icons/bi'
 import {useLoginUserMutation} from '../../services/appApi'
 import Alert from "../Alert";
 import Img1 from '../../assets/img1.svg'
+import { socket } from "../../features/messageSlice";
 
 
 const Login = () =>
@@ -15,8 +17,11 @@ const Login = () =>
   const user = useSelector((state) => state.user);
   
  useEffect(() => {
-   if (user?._id) {
-     navigate("/");
+   if (user?._id)
+   {
+     console.log("hello")
+     socket.emit("new-user");
+     navigate("/chat");
    }
  }, [user?._id]);
 
@@ -25,7 +30,7 @@ const Login = () =>
         password:""
     }
     const [formDetails, setFormDetails] = useState(initialState)
-  const [loginUser, { isLoading, error }] = useLoginUserMutation()
+  const [loginUser] = useLoginUserMutation()
   
     const onChangeHandler = (prop, val) =>
     {

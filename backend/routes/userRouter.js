@@ -135,4 +135,17 @@ userRouter.delete(
   })
 );
 
+
+// @desc Get the rooms of that particular users
+// @route GET /api/users/rooms
+// @access PRIVATE
+const rooms = ["crypto", "web3", "linux", "UI/UX"];
+
+
+userRouter.get("/rooms", (req, res) =>
+{
+  // res.status(401).json({message:"haha"})
+  res.json(rooms);
+});
+
 export default userRouter;

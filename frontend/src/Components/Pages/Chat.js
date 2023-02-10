@@ -1,22 +1,60 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 import { SlArrowLeft } from "react-icons/sl";
 import { IoChatbubblesSharp } from "react-icons/io5";
 import MessageForm from "../MessageForm";
-const Chat = () => {
-  const [open, setOpen] = useState(true);
+import { useDispatch, useSelector } from "react-redux";
+import { useProfileUserRoomsMutation } from "../../services/msgApi";
+import { generateOrderId, handleFunction } from "../../utils/util";
+import {
+  setCurrentRoom,
+  setPrivateMemberMsg,
+  socket,
+} from "../../features/messageSlice";
+import { addNotifications, resetNotifications } from "../../features/userSlice";
 
-  const rooms = ["crypto", "web3", "linux", "finance"];
-  const members = ["John", "Dane", "Jane", "Rose"];
+const Chat = () => {
+  const dispatch = useDispatch();
+  const { members, rooms, currentRoom, privateMemberMsg } = useSelector(
+    (state) => state.message
+  );
+  const user = useSelector((state) => state.user);
+  const [open, setOpen] = useState(true);
+  const [profileUserRooms] = useProfileUserRoomsMutation();
+
+  const joinRoom = (room, isPublic = true) => {
+    if (!user._id) return;
+    socket.emit("join-room", room,currentRoom);
+    dispatch(setCurrentRoom(room));
+    if (isPublic) dispatch(setPrivateMemberMsg(null));
+
+    // dispatch for notifications
+
+    dispatch(resetNotifications(room));
+  };
+
+  socket.off("notification").on("notification", (room) => {
+    if (room !== currentRoom) dispatch(addNotifications(room));
+  });
+
+  const handlePrivateMember = (member) => {
+    dispatch(setPrivateMemberMsg(member));
+    const roomId = generateOrderId(user._id, member._id);
+    joinRoom(roomId, false);
+  };
+  useEffect(() => {
+    handleFunction(dispatch, profileUserRooms);
+  }, []);
 
   return (
-    <div className="flex">
+    <div className="flex max-h-screen ">
       <div
         className={` ${
-          open ? "w-72" : "w-24 "
-        } bg-gray-800 h-screen p-5  pt-8 relative duration-300`}
+          open ? "w-[20rem]" : "w-24 "
+        } bg-gray-800 max-h-screen p-5  pt-8 relative duration-300 overflow-scroll`}
       >
         <SlArrowLeft
-          className={`absolute cursor-pointer -right-3 top-9 w-7 h-7 p-1 text-lg bg-purple-600
+          className={`absolute cursor-pointer right-2 top-9 w-7 h-7 p-1 text-lg bg-purple-600
            border-2 rounded-full  ${!open && "rotate-180"}`}
           onClick={() => setOpen(!open)}
         />
@@ -30,42 +68,83 @@ const Chat = () => {
           </div>
         </div>
         <ul className="pt-6">
-                  <h3 className="text-md font-bold text-white">Rooms({ rooms.length})</h3>
+          <h3 className="text-md font-bold text-white">
+            Rooms({rooms.length})
+          </h3>
           {rooms.map((room, index) => (
             <li
               key={index}
-              className={`flex text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center gap-x-4 `}
+              className={`flex relative text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center gap-x-4 `}
+              onClick={() => joinRoom(room)}
             >
               <span
                 className={`${
                   !open && "hidden"
-                } origin-left duration-200 text-accent btn w-full`}
+                } origin-left duration-200  btn w-full
+                ${room === currentRoom ? "text-white bg-accent" : "text-accent"}
+                `}
               >
                 {room}
+                {user?.newMessages && user?.newMessages[room] && (
+                  <div class="indicator absolute top-[50%] right-10">
+                    <span class="indicator-item badge badge-accent">
+                      {user?.newMessages[room]}
+                    </span>
+                  </div>
+                )}
               </span>
             </li>
           ))}
           <h3 className="text-md font-bold text-white">
             Members ({members.length})
           </h3>
-          {members.map((member, index) => (
-            <li
-              key={index}
-              className={`flex text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center gap-x-4 `}
-            >
-              <span
-                className={`${
-                  !open && "hidden"
-                } origin-left duration-200 btn btn-outline btn-secondary w-full`}
+          {members.map((member, index) => {
+            if (member._id === user._id) return <></>;
+            return (
+              <li
+                key={member._id}
+                className={`flex text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center justify-center  gap-x-4 px-4`}
+                onClick={() => handlePrivateMember(member)}
               >
-                {member}
-              </span>
-            </li>
-          ))}
+                <span
+                  className={`${
+                    !open && "hidden"
+                  } origin-left duration-200 btn  w-full
+                    ${
+                      member?._id === privateMemberMsg?._id
+                        ? "btn btn-secondary"
+                        : "btn-outline btn-secondary"
+                    }
+                    `}
+                >
+                  <div class={`avatar ${member.status} mx-4`}>
+                    <div class="w-9 rounded-full">
+                      <img src={member?.picture} alt={member.name} />
+                    </div>
+                  </div>
+                  <p className="mr-auto">{member.name}</p>
+                  {user.newMessages &&
+                    user?.newMessages[
+                      generateOrderId(member._id, user._id)
+                    ] && (
+                      <div class="indicator absolute top-[50%] right-10">
+                        <span class="indicator-item badge badge-accent">
+                          {
+                            user.newMessages[
+                              generateOrderId(member._id, user._id)
+                            ]
+                          }
+                        </span>
+                      </div>
+                    )}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
       <div className="h-screen flex-1 p-7 ">
-        <MessageForm/>
+        <MessageForm />
       </div>
     </div>
   );
