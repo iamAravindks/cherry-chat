@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start":"node backend/server.js",
     "dev": "nodemon backend/server.js",
     "client:dev": "cd frontend && npm start"
   },

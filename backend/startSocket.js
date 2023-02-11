@@ -12,13 +12,12 @@ import {
 import Message from "./models/Message.js";
 import User from "./models/userModel.js";
 import mongoose from "mongoose";
-import config from "./config.js";
 
 export const startSocket = (server) => {
   const app = express();
   const io = new Server(server, {
     /* options */
-    cors: config.CLIENT_CONNECTION
+    cors: "http://localhost:3000",
   });
 
   io.on("connection", (socket) => {

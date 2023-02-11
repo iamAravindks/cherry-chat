@@ -7,5 +7,4 @@ export default {
   MONGODB_URL: process.env.MONGODB_URL,
   JWT_SECRET: process.env.JWT_SECRET,
   AUTH_COOKIE: process.env.AUTH_COOKIE,
-  CLIENT_CONNECTION: process.env.CLIENT_CONNECTION,
 };
