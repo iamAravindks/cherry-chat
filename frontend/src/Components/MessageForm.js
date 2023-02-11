@@ -8,8 +8,8 @@ import LeaveRoom from "./LeaveRoom";
 const MessageForm = () => {
   const dispatch = useDispatch();
 
-  const scrollToBottom = () =>
-    lastMsgRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (ref) =>
+    ref.current?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
     socket.off("room-messages").on("room-messages", async (roomMessages) => {
@@ -24,9 +24,11 @@ const MessageForm = () => {
   );
   const [currentMessage, setCurrentMessage] = useState("");
   const lastMsgRef = useRef();
+  const formRef = useRef(null)
   const todayDate = getFormattedDate();
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom(lastMsgRef);
+    scrollToBottom(formRef)
   }, [messages]);
 
   const handleSubmit = (e) => {
@@ -145,7 +147,7 @@ const MessageForm = () => {
             ))}
           <div ref={lastMsgRef}></div>
         </div>
-        <form className="w-full  flex gap-1 " onSubmit={handleSubmit}>
+        <form className="w-full  flex gap-1 " onSubmit={handleSubmit} ref={formRef}>
           <input
             type="text"
             placeholder="Type Your Message here.."

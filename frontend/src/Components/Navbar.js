@@ -54,9 +54,7 @@ const Navbar = () =>
               <li>
                 <Link to="/chat">Chat</Link>
               </li>
-              <li>
-                <Link to="/">Item 1</Link>
-              </li>
+
             </ul>
           </div>
           <Link to="/" className="btn btn-ghost normal-case text-xl ml-4">
@@ -71,9 +69,7 @@ const Navbar = () =>
             <li>
               <Link to="/chat">Chat</Link>
             </li>
-            <li>
-              <Link to="/">Item 1</Link>
-            </li>
+
           </ul>
         </div>
         <div className="navbar-end">

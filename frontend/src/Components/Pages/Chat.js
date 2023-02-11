@@ -4,8 +4,7 @@ import { SlArrowLeft } from "react-icons/sl";
 import { IoChatbubblesSharp } from "react-icons/io5";
 import MessageForm from "../MessageForm";
 import { useDispatch, useSelector } from "react-redux";
-import { useProfileUserRoomsMutation } from "../../services/msgApi";
-import { generateOrderId, handleFunction } from "../../utils/util";
+import { generateOrderId } from "../../utils/util";
 import {
   setCurrentRoom,
   setPrivateMemberMsg,
@@ -21,7 +20,6 @@ const Chat = () => {
   );
   const user = useSelector((state) => state.user);
   const [open, setOpen] = useState(true);
-  const [profileUserRooms] = useProfileUserRoomsMutation();
 
   const joinRoom = (room, isPublic = true) => {
     if (!user._id) return;
@@ -53,7 +51,7 @@ const Chat = () => {
       <div
         className={` ${
           open ? "w-[20rem]" : "w-24 "
-        } bg-gray-800 max-h-screen p-5  pt-8 relative duration-300 overflow-scroll`}
+        } bg-gray-800 max-h-screen p-5  pt-8 relative duration-300 overflow-y-scroll`}
       >
         <SlArrowLeft
           className={`absolute cursor-pointer right-2 top-9 w-7 h-7 p-1 text-lg bg-purple-600
