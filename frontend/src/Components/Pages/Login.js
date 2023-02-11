@@ -19,7 +19,6 @@ const Login = () =>
  useEffect(() => {
    if (user?._id)
    {
-     console.log("hello")
      socket.emit("new-user");
      navigate("/chat");
    }

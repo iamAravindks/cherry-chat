@@ -3,6 +3,7 @@ import { FaTelegramPlane } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessages, socket } from "../features/messageSlice";
 import { getFormattedDate, getTime, getUser } from "../utils/util";
+import LeaveRoom from "./LeaveRoom";
 
 const MessageForm = () => {
   const dispatch = useDispatch();
@@ -12,12 +13,10 @@ const MessageForm = () => {
 
   useEffect(() => {
     socket.off("room-messages").on("room-messages", async (roomMessages) => {
+      console.log(roomMessages);
       if (roomMessages) dispatch(setMessages(roomMessages));
     });
-     
   }, []);
-
-
 
   const user = useSelector((state) => state.user);
   const { currentRoom, messages, privateMemberMsg } = useSelector(
@@ -52,7 +51,9 @@ const MessageForm = () => {
           {user._id && privateMemberMsg?._id && (
             <>
               <div className="w-full min-h-[100px] flex items-center justify-center flex-col  mx-auto mb-3 ">
-                <p className="m-2">Chat between {privateMemberMsg?.name} & You</p>
+                <p className="m-2">
+                  Chat between {privateMemberMsg?.name} & You
+                </p>
                 <div className="w-full h-full flex items-center justify-center gap-4">
                   <div className={`avatar ${privateMemberMsg?.status}`}>
                     <div className="w-16 rounded-full  ring ring-secondary ring-offset-base-100 ring-offset-2">
@@ -71,6 +72,9 @@ const MessageForm = () => {
               </div>
             </>
           )}
+          {
+            currentRoom && <LeaveRoom/>
+          }
           {user._id &&
             currentRoom != null &&
             messages.map(({ _id: date, messageByDate }, idx) => (
@@ -79,8 +83,39 @@ const MessageForm = () => {
                   {date}
                 </p>
                 {messageByDate?.map(
-                  ({ content, time, from: sender }, msgIdx) => (
-                    <div
+                  ({ content, time, from: sender, notification }, msgIdx) => {
+                    if (notification) {
+                      return (
+                        <div className="alert alert-info shadow-lg my-5 mx-auto w-[80%] h-[60px]">
+                          <div>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              className="stroke-current flex-shrink-0 w-6 h-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              ></path>
+                            </svg>
+                            <span className="flex justify-center items-center gap-2">
+                              {" "}
+                              <div class="chat-image avatar">
+                                <div class="w-10 rounded-full">
+                                  <img src={sender.picture} alt={sender.name} />
+                                </div>
+                              </div>
+                              {content}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                   return( <div
                       class={`chat ${
                         sender._id === user._id ? "chat-end" : "chat-start"
                       }`}
@@ -103,8 +138,8 @@ const MessageForm = () => {
                       >
                         {content}
                       </div>
-                    </div>
-                  )
+                    </div>)
+                  }
                 )}
               </>
             ))}

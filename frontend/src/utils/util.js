@@ -46,3 +46,10 @@ export const getUser = (user) => {
 
 export const generateOrderId = (id1, id2) =>
   id1 > id2 ? `${id1}-${id2}` : `${id2}-${id1}`;
+
+export const checkRoomAdmin = (rooms, roomId, userId) => {
+  const roomWithAdmin = rooms.filter(
+    (room) => room._id === roomId && room.admin === userId
+  );
+  return roomWithAdmin.length > 0;
+};

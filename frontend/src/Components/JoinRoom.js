@@ -1,16 +1,31 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import SelectMembers from "./SelectMembers";
+import { socket } from "../features/messageSlice";
+import { useSelector } from "react-redux";
+import { getFormattedDate, getTime } from "../utils/util";
 
 const JoinRoom = () => {
-    const [newRoomName, setNewRoomName] = useState("");
+  const [newRoomName, setNewRoomName] = useState("");
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [selectMembersID, setSelectMembersID] = useState([]);
+
+  const closeRef = useRef(null);
+  const user = useSelector((state) => state.user);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    socket.userId = user._id;
+    socket.emit("create-room", newRoomName, user._id, selectedMembers);
+    closeRef.current.click();
+    setSelectedMembers((prev) => []);
+    setNewRoomName("");
+    setSelectMembersID([]);
     
-    const handleSubmit = (e =>
-    {
-        e.preventDefault()
-    })
+  };
   return (
     <div className="w-full  flex items-center justify-center mb-3">
       {/* The button to open modal */}
-      <label htmlFor="my-modal-3" className="btn btn-info">
+      <label htmlFor="my-modal-3" className="btn btn-info" ref={closeRef}>
         Create New Room
       </label>
 
@@ -32,9 +47,19 @@ const JoinRoom = () => {
               className="input input-bordered input-info w-full max-w-xs"
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
+              required
             />
-            <button type="submit" className="btn btn-outline btn-info">Create</button>
+
+            <button type="submit" className="btn btn-outline btn-info">
+              Create
+            </button>
           </form>
+          <SelectMembers
+            selectedMembers={selectedMembers}
+            setSelectedMembers={setSelectedMembers}
+            selectMembersID={selectMembersID}
+            setSelectMembersID={setSelectMembersID}
+          />
           <div className="modal-action"></div>
         </div>
       </div>

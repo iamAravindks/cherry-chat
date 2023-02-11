@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { BiLogInCircle, BiImageAdd } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useSignUpUserMutation } from "../../services/appApi";
 import Img2 from "../../assets/img2.svg";
 import avatar from "../../assets/default.svg";
 import { uploadImg } from "../../utils/util";
 import Alert from "../Alert";
+import { setLoading } from "../../features/userSlice";
 
 
 
@@ -15,6 +16,7 @@ const Signup = () =>
 {
   
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,7 +52,9 @@ const Signup = () =>
       email: formDetails.email,
       password: formDetails.password,
     };
-    if (imgUpload) {
+    if (imgUpload)
+    {
+      dispatch(setLoading(true))
       const img = await uploadImg(imgUpload);
       console.log(img);
       setFormDetails((prev) => {
@@ -61,6 +65,8 @@ const Signup = () =>
     }
     const res = await signUpUser(user);
     console.log(res);
+      dispatch(setLoading(false));
+
   };
 
   const validateImg = (e) => {

@@ -44,7 +44,8 @@ const Chat = () => {
     joinRoom(roomId, false);
   };
   useEffect(() => {
-    handleFunction(dispatch, profileUserRooms);
+    // handleFunction(dispatch, profileUserRooms);
+    socket.emit('load-rooms',user._id)
   }, []);
 
   return (
@@ -77,19 +78,19 @@ const Chat = () => {
             <li
               key={index}
               className={`flex relative text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center gap-x-4 `}
-              onClick={() => joinRoom(room)}
+              onClick={() => joinRoom(room._id)}
             >
               <span
                 className={`${
                   !open && "hidden"
                 } origin-left duration-200  btn w-full
-                ${room === currentRoom ? "text-white bg-accent" : "text-accent"}
+                ${room._id === currentRoom ? "text-white bg-accent" : "text-accent"}
                 `}
               >
-                {room}
+                {room?.name}
                 {user?.newMessages && user?.newMessages[room] && (
-                  <div class="indicator absolute top-[50%] right-10">
-                    <span class="indicator-item badge badge-accent">
+                  <div className="indicator absolute top-[50%] right-10">
+                    <span className="indicator-item badge badge-accent">
                       {user?.newMessages[room]}
                     </span>
                   </div>
@@ -101,7 +102,7 @@ const Chat = () => {
             Members ({members.length})
           </h3>
           {members.map((member, index) => {
-            if (member._id === user._id) return <></>;
+            if (member._id !== user._id)
             return (
               <li
                 key={member._id}
@@ -119,8 +120,8 @@ const Chat = () => {
                     }
                     `}
                 >
-                  <div class={`avatar ${member.status} mx-4`}>
-                    <div class="w-9 rounded-full">
+                  <div className={`avatar ${member.status} mx-4`}>
+                    <div className="w-9 rounded-full">
                       <img src={member?.picture} alt={member.name} />
                     </div>
                   </div>
@@ -129,8 +130,8 @@ const Chat = () => {
                     user?.newMessages[
                       generateOrderId(member._id, user._id)
                     ] && (
-                      <div class="indicator absolute top-[50%] right-10">
-                        <span class="indicator-item badge badge-accent">
+                      <div className="indicator absolute top-[50%] right-10">
+                        <span className="indicator-item badge badge-accent">
                           {
                             user.newMessages[
                               generateOrderId(member._id, user._id)
@@ -151,4 +152,5 @@ const Chat = () => {
     </div>
   );
 };
+
 export default Chat;

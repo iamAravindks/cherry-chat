@@ -10,7 +10,7 @@ import { Home } from "./Components/Pages/Home";
 import Login from "./Components/Pages/Login";
 import Signup from "./Components/Pages/Signup";
 import PrivateRouteWrapper from "./Components/PrivateRouteWrapper";
-import { addMembers, socket } from "./features/messageSlice";
+import { addMembers, setRooms, socket } from "./features/messageSlice";
 import { loadID } from "./features/userSlice";
 import { useProfileUserMutation } from "./services/appApi";
 
@@ -31,9 +31,18 @@ const App = (props) => {
     dispatch(loadID());
     if (user._id) {
       profileUser();
+      
       socket.off("new-user").on("new-user", (payload) => {
         dispatch(addMembers(payload));
       });
+
+      socket.off("rooms-loaded").on("rooms-loaded", async data =>
+      {
+        console.log(data)
+        const payload = { rooms: data, user: user._id };
+        dispatch(setRooms(payload))
+      })
+      
     }
   }, [user._id]);
   return (

@@ -23,18 +23,25 @@ export const messageSlice = createSlice({
     addMembers: (state, { payload }) => {
       state.members = payload;
     },
-    setCurrentRoom: (state, { payload }) =>
-    {
-      return {...state,currentRoom:payload}
+    setCurrentRoom: (state, { payload }) => {
+      return { ...state, currentRoom: payload };
     },
     setMessages: (state, { payload }) => {
       return { ...state, messages: payload };
     },
-    setPrivateMemberMsg: (state, { payload }) =>
-    {
-      return {...state,privateMemberMsg:payload}
-      
-    }
+    setPrivateMemberMsg: (state, { payload }) => {
+      return { ...state, privateMemberMsg: payload };
+    },
+    setRooms: (state, { payload }) => {
+      const roomsWithUser = payload?.rooms.filter((room) => {
+        if (room.admin === payload?.user) return true;
+        else {
+          return room.members.some((member) => member.user === payload?.user);
+        }
+      });
+      return { ...state, rooms: roomsWithUser };
+    },
+
   },
   extraReducers: (builder) => {
     // your extra reducers go here
@@ -51,6 +58,12 @@ export const messageSlice = createSlice({
   },
 });
 
-export const { addMembers, setCurrentRoom, setMessages, setPrivateMemberMsg } =
-  messageSlice.actions;
+export const {
+  addMembers,
+  setCurrentRoom,
+  setMessages,
+  setPrivateMemberMsg,
+  setRooms,
+  
+} = messageSlice.actions;
 export default messageSlice.reducer;
