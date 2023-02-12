@@ -27,6 +27,7 @@ const Chat = () => {
     socket.emit("join-room", room, currentRoom);
     dispatch(setCurrentRoom(room));
     if (isPublic) dispatch(setPrivateMemberMsg(null));
+    else dispatch(dispatch(setCurrentRoom(null)));
 
     // dispatch for notifications
 

@@ -13,7 +13,7 @@ export const messageSlice = createSlice({
     currentRoom: null,
     members: [],
     messages: [],
-    privateMemberMsg: {},
+    privateMemberMsg: null,
     newMessages: {},
     error: null,
     socket: null,
@@ -33,7 +33,7 @@ export const messageSlice = createSlice({
     },
     setRooms: (state, { payload }) => {
       const roomsWithUser = payload?.rooms.filter((room) => {
-        if (room.admin === payload?.user) return true;
+        if (room.admin === payload.user) return true;
         else {
           return room.members.some((member) => member.user === payload?.user);
         }

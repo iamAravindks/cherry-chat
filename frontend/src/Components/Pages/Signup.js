@@ -11,23 +11,22 @@ import Alert from "../Alert";
 import { setLoading } from "../../features/userSlice";
 import { setSocket } from "../../features/messageSlice";
 
-
-
-const Signup = () =>
-{
-  
+const Signup = () => {
   const user = useSelector((state) => state.user);
-  const {socket} = useSelector(state=>state.message)
-  const dispatch = useDispatch()
+  const { socket } = useSelector((state) => state.message);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-       if (user?._id) {
-         dispatch(setSocket());
-         if (socket) socket.emit("new-user");
-         navigate("/chat");
-       }
-  }, [user?._id,socket]);
+    if (user?._id) {
+      dispatch(setSocket());
+      if (socket) {
+        socket.emit("new-user");
+        socket.emit("load-rooms", user._id);
+      }
+      navigate("/chat");
+    }
+  }, [user?._id, socket]);
 
   const initialState = {
     name: "",
@@ -56,9 +55,8 @@ const Signup = () =>
       email: formDetails.email,
       password: formDetails.password,
     };
-    if (imgUpload)
-    {
-      dispatch(setLoading(true))
+    if (imgUpload) {
+      dispatch(setLoading(true));
       const img = await uploadImg(imgUpload);
       console.log(img);
       setFormDetails((prev) => {
@@ -69,8 +67,7 @@ const Signup = () =>
     }
     const res = await signUpUser(user);
     console.log(res);
-      dispatch(setLoading(false));
-
+    dispatch(setLoading(false));
   };
 
   const validateImg = (e) => {
@@ -87,7 +84,6 @@ const Signup = () =>
 
     setImgUpload(file);
   };
-
 
   return (
     <>

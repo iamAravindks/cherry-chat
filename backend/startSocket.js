@@ -177,12 +177,12 @@ export const startSocket = (server) => {
 
       let roomMessages = await getLastMessagesFromRoom(newRoom);
       roomMessages = sortRoomMessagesByDate(roomMessages);
-        console.log(roomMessages);
 
       socket.emit("room-messages", roomMessages);
     });
 
-    socket.on("message-room", async (room, content, sender, time, date) => {
+    socket.on("message-room", async (room, content, sender, time, date) =>
+    {
       const newMessage = await Message.create({
         content,
         from: sender,

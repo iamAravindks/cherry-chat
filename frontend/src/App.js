@@ -10,7 +10,7 @@ import { Home } from "./Components/Pages/Home";
 import Login from "./Components/Pages/Login";
 import Signup from "./Components/Pages/Signup";
 import PrivateRouteWrapper from "./Components/PrivateRouteWrapper";
-import { addMembers, checkMessageOfRoom, setRooms, setSocket } from "./features/messageSlice";
+import { addMembers, checkMessageOfRoom, setMessages, setRooms, setSocket } from "./features/messageSlice";
 import { loadID } from "./features/userSlice";
 import { useProfileUserMutation } from "./services/appApi";
 
@@ -47,11 +47,17 @@ const App = (props) => {
       });
 
       socket.off("rooms-loaded").on("rooms-loaded", async (data) => {
-        console.log(data);
+        console.log("room",data);
         const payload = { rooms: data, user: user._id };
         dispatch(setRooms(payload));
         dispatch(checkMessageOfRoom())
       });
+            socket
+              .off("room-messages")
+              .on("room-messages", async (roomMessages) => {
+                console.log(roomMessages);
+                if (roomMessages) dispatch(setMessages(roomMessages));
+              });
 
       socket.emit("new-user")
     }

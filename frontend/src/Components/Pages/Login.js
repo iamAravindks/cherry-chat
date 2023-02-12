@@ -18,7 +18,11 @@ const Login = () => {
   useEffect(() => {
     if (user?._id) {
       dispatch(setSocket());
-      if (socket) socket.emit("new-user");
+      if (socket)
+      {
+        socket.emit("new-user")
+      socket.emit("load-rooms",user._id)
+      };
       navigate("/chat");
     }
   }, [user?._id,socket]);

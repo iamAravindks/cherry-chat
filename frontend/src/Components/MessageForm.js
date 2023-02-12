@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessages } from "../features/messageSlice";
+import { setError } from "../features/userSlice";
 import { getFormattedDate, getTime, getUser } from "../utils/util";
 import LeaveRoom from "./LeaveRoom";
+import Alert from '../Components/Alert'
 
 const MessageForm = () => {
   const dispatch = useDispatch();
@@ -13,14 +15,7 @@ const MessageForm = () => {
   const scrollToBottom = (ref) =>
     ref.current?.scrollIntoView({ behavior: "smooth" });
 
-  useEffect(() => {
-    if (socket) {
-      socket.off("room-messages").on("room-messages", async (roomMessages) => {
-        console.log(roomMessages);
-        if (roomMessages) dispatch(setMessages(roomMessages));
-      });
-    }
-  }, [socket]);
+
 
   const { currentRoom, messages, privateMemberMsg } = useSelector(
     (state) => state.message
@@ -34,7 +29,14 @@ const MessageForm = () => {
     scrollToBottom(formRef);
   }, [messages]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e) =>
+  {
+    
+    if (!currentRoom && !privateMemberMsg)
+    {
+      dispatch(setError("Select a chat"))
+      return
+    }
     e.preventDefault();
     const currentTime = getTime();
     const roomId = currentRoom;
@@ -52,6 +54,7 @@ const MessageForm = () => {
   return (
     <>
       <div className="bg-gray-700 w-full min-h-[95%] flex flex-col rounded-md">
+        {user.error && <Alert>{user.error}</Alert>}
         <div className="w-full h-[90vh]  flex-grow p-3 overflow-y-scroll">
           {user._id && privateMemberMsg?._id && (
             <>
@@ -77,7 +80,27 @@ const MessageForm = () => {
               </div>
             </>
           )}
-          {(currentRoom && privateMemberMsg===null )&& <LeaveRoom />}
+          {currentRoom && !privateMemberMsg && <LeaveRoom />}
+          {!currentRoom && !privateMemberMsg && (
+            <div className="alert shadow-lg">
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-info flex-shrink-0 w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <span>select a chat to start conversation.</span>
+              </div>
+            </div>
+          )}
           {user._id &&
             currentRoom != null &&
             messages.map(({ _id: date, messageByDate }, idx) => (
@@ -89,7 +112,7 @@ const MessageForm = () => {
                   ({ content, time, from: sender, notification }, msgIdx) => {
                     if (notification) {
                       return (
-                        <div className="alert alert-info shadow-lg my-5 mx-auto w-[80%] h-[60px]">
+                        <div className="alert alert-ghost shadow-lg my-5 mx-auto w-[80%] h-[60px]">
                           <div>
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +186,11 @@ const MessageForm = () => {
             value={currentMessage}
             onChange={(e) => setCurrentMessage(e.target.value)}
           />
-          <button type="submit" className="btn btn-primary min-w-[10%]">
+          <button
+            type="submit"
+            className="btn btn-primary min-w-[10%]"
+            disabled={(!currentRoom && !privateMemberMsg)}
+          >
             <FaTelegramPlane className="text-lg" />
           </button>
         </form>
