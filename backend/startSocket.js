@@ -239,10 +239,10 @@ export const startSocket = (server) => {
         if (user) {
           user.status = status;
           await user.save();
+          const members = await User.find().select("-password");
+          socket.broadcast.emit("new-user", members);
         }
 
-        const members = await User.find().select("-password");
-        socket.broadcast.emit("new-user", members);
       } catch (error)
       {
         console.log(error)
