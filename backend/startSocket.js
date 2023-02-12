@@ -14,7 +14,6 @@ import User from "./models/userModel.js";
 import mongoose from "mongoose";
 import config from "./config.js";
 
-
 export const startSocket = (server) => {
   const app = express();
   const io = new Server(server, {
