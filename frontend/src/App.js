@@ -11,7 +11,7 @@ import Login from "./Components/Pages/Login";
 import Signup from "./Components/Pages/Signup";
 import PrivateRouteWrapper from "./Components/PrivateRouteWrapper";
 import { addMembers, checkMessageOfRoom, setMessages, setRooms, setSocket } from "./features/messageSlice";
-import { loadID } from "./features/userSlice";
+import { addNotifications, loadID } from "./features/userSlice";
 import { useProfileUserMutation } from "./services/appApi";
 
 const Layout = () => {
@@ -42,7 +42,7 @@ const App = (props) => {
     if (socket) {
       socket.off("new-user").on("new-user", (payload) =>
       {
-        
+        console.log(payload)
         dispatch(addMembers(payload));
       });
 
@@ -57,7 +57,9 @@ const App = (props) => {
               .on("room-messages", async (roomMessages) => {
                 if (roomMessages) dispatch(setMessages(roomMessages));
               });
-
+      socket.off("notification").on("notification", (room) => {
+        if (room !== currentRoom) dispatch(addNotifications(room));
+      });
       socket.emit("new-user")
     }
   }, [socket]);

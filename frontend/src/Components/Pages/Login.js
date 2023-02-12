@@ -21,6 +21,7 @@ const Login = () => {
       if (socket)
       {
         socket.emit("new-user")
+        socket.emit("set-status",user._id,"online")
       socket.emit("load-rooms",user._id)
       };
       navigate("/chat");

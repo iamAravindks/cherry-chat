@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import Room from "./models/RoomModel.js";
-import {
+import generateToken, {
   getFormattedDate,
   getLastMessagesFromRoom,
   getRooms,
@@ -52,7 +52,7 @@ export const startSocket = (server) => {
         members: members.map((member) => ({
           user: member._id,
           adminAccess: member.adminAccess || false,
-          name:member.name
+          name: member.name,
         })),
       });
 
@@ -170,8 +170,8 @@ export const startSocket = (server) => {
     });
 
     // join chat
-    socket.on("join-room", async (newRoom, previousRoom) =>
-    {
+    socket.on("join-room", async (newRoom, previousRoom) => {
+      console.log(newRoom);
       socket.join(newRoom);
       socket.leave(previousRoom);
 
@@ -181,8 +181,7 @@ export const startSocket = (server) => {
       socket.emit("room-messages", roomMessages);
     });
 
-    socket.on("message-room", async (room, content, sender, time, date) =>
-    {
+    socket.on("message-room", async (room, content, sender, time, date) => {
       const newMessage = await Message.create({
         content,
         from: sender,
@@ -201,23 +200,61 @@ export const startSocket = (server) => {
       socket.broadcast.emit("notification", room);
     });
     app.delete(
-      "/api/users/logout",
+      "/api/users/logout/:id",
       expressAsyncHandler(async (req, res) => {
         try {
-          const { _id, newMessages } = req.body;
-          const user = await User.findById(_id);
-          user.status = "offline";
-          user.newMessages = newMessages;
-          await user.save();
+          const user = await User.findById(req.params.id);
+          if (user) {
+            user.status = "offline";
+            user.newMessages = newMessages;
+            await user.save();
+          }
+
           const members = await User.find().select("-password");
           socket.broadcast.emit("new-user", members);
-          res.status(200);
+
+          const token = generateToken(
+            Math.floor(Math.random() * (1000000 - 100000) + 100000)
+          );
+          res.cookie(config.AUTH_COOKIE, token, {
+            httpOnly: true,
+            maxAge: 0,
+          });
+
+          res.json({
+            message: "successfully logout in",
+          });
         } catch (error) {
           res.status(400);
           throw new Error(error.message);
         }
       })
     );
+
+    // set user to offline on logout
+
+    socket.on("set-status", async (_id,status) => {
+      try {
+        const user = await User.findById(_id);
+        if (user) {
+          user.status = status;
+          await user.save();
+        }
+
+        const members = await User.find().select("-password");
+        socket.broadcast.emit("new-user", members);
+      } catch (error)
+      {
+        console.log(error)
+        throw new Error("Not allowed")
+      }
+    });
+
+
+
+
+
+
     socket.on("error", (error) => {
       console.error("Socket error:", error);
     });

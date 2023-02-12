@@ -1,10 +1,18 @@
 import { Link } from "react-router-dom";
-import { useSelector } from 'react-redux'
-import {useLogoutMutation} from '../services/appApi'
-import Alert from './Alert'
+import { useSelector } from "react-redux";
+import { useLogoutMutation } from "../services/appApi";
+import Alert from "./Alert";
 
-const ProfileAvatar = ({ url,logout }) =>
-{
+const ProfileAvatar = ({ url, logout }) => {
+  const { socket } = useSelector((state) => state.message);
+  const { _id } = useSelector((state) => state.user);
+
+  const handleLogout = () => {
+    if (socket) {
+      socket.emit("set-status", _id, "offline");
+    }
+    logout();
+  };
   return (
     <div className="flex gap-3  max-h-[50px] items-center ">
       <div className="avatar w-14  online">
@@ -12,16 +20,17 @@ const ProfileAvatar = ({ url,logout }) =>
           <img src={url} alt="profile" />
         </div>
       </div>
-      <button className="btn" onClick={logout}>Logout</button>
+      <button className="btn" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
-}
+};
 
-const Navbar = () =>
-{
-  const { _id, picture } = useSelector(state => state.user)
-  const [logout, {  error }] = useLogoutMutation();
-  
+const Navbar = () => {
+  const { _id, picture } = useSelector((state) => state.user);
+  const [logout, { error }] = useLogoutMutation();
+
   return (
     <>
       {error && <Alert>{error}</Alert>}
@@ -54,7 +63,6 @@ const Navbar = () =>
               <li>
                 <Link to="/chat">Chat</Link>
               </li>
-
             </ul>
           </div>
           <Link to="/" className="btn btn-ghost normal-case text-xl ml-4">
@@ -69,7 +77,6 @@ const Navbar = () =>
             <li>
               <Link to="/chat">Chat</Link>
             </li>
-
           </ul>
         </div>
         <div className="navbar-end">
@@ -84,6 +91,6 @@ const Navbar = () =>
       </div>
     </>
   );
-}
+};
 
-export default Navbar
+export default Navbar;

@@ -9,7 +9,7 @@ import {
   setCurrentRoom,
   setPrivateMemberMsg,
 } from "../../features/messageSlice";
-import { addNotifications, resetNotifications } from "../../features/userSlice";
+import {  resetNotifications } from "../../features/userSlice";
 import JoinRoom from "../JoinRoom";
 
 const Chat = () => {
@@ -27,7 +27,7 @@ const Chat = () => {
     socket.emit("join-room", room, currentRoom);
     dispatch(setCurrentRoom(room));
     if (isPublic) dispatch(setPrivateMemberMsg(null));
-    else dispatch(dispatch(setCurrentRoom(null)));
+
 
     // dispatch for notifications
 
@@ -43,9 +43,6 @@ const Chat = () => {
     // handleFunction(dispatch, profileUserRooms);
     if (socket) {
       socket.emit("load-rooms", user._id);
-      socket.off("notification").on("notification", (room) => {
-        if (room !== currentRoom) dispatch(addNotifications(room));
-      });
     }
   }, [socket]);
 
@@ -93,13 +90,13 @@ const Chat = () => {
                 `}
               >
                 {room?.name}
-                {user?.newMessages && user?.newMessages[room] && (
+                {/* {user?.newMessages && user?.newMessages[room] && (
                   <div className="indicator absolute top-[50%] right-10">
                     <span className="indicator-item badge badge-accent">
                       {user?.newMessages[room]}
                     </span>
                   </div>
-                )}
+                )} */}
               </span>
             </li>
           ))}
@@ -131,11 +128,11 @@ const Chat = () => {
                       </div>
                     </div>
                     <p className="mr-auto">{member.name}</p>
-                    {user.newMessages &&
+                    {/* {user.newMessages &&
                       user?.newMessages[
                         generateOrderId(member._id, user._id)
                       ] && (
-                        <div className="indicator absolute top-[50%] right-10">
+                        <div className="indicator ">
                           <span className="indicator-item badge badge-accent">
                             {
                               user.newMessages[
@@ -144,7 +141,7 @@ const Chat = () => {
                             }
                           </span>
                         </div>
-                      )}
+                      )} */}
                   </span>
                 </li>
               );

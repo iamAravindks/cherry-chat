@@ -123,6 +123,7 @@ userRouter.put(
 
 userRouter.delete(
   "/logout",
+  isAuth,
   expressAsyncHandler(async (req, res) => {
     const token = generateToken(
       Math.floor(Math.random() * (1000000 - 100000) + 100000));
@@ -130,6 +131,7 @@ userRouter.delete(
       httpOnly: true,
       maxAge: 0,
     });
+
     res.json({
       message: "successfully logout in",
     });
