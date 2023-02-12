@@ -1,6 +1,5 @@
 import axios from "axios";
 import { setError, setLoading } from "../features/userSlice";
-
 export const uploadImg = async (filename) => {
   const formData = new FormData();
   formData.append("file", filename);
@@ -53,3 +52,5 @@ export const checkRoomAdmin = (rooms, roomId, userId) => {
   );
   return roomWithAdmin.length > 0;
 };
+
+

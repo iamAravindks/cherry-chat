@@ -8,7 +8,6 @@ import { generateOrderId } from "../../utils/util";
 import {
   setCurrentRoom,
   setPrivateMemberMsg,
-  socket,
 } from "../../features/messageSlice";
 import { addNotifications, resetNotifications } from "../../features/userSlice";
 import JoinRoom from "../JoinRoom";
@@ -19,11 +18,13 @@ const Chat = () => {
     (state) => state.message
   );
   const user = useSelector((state) => state.user);
+  const { socket } = useSelector((state) => state.message);
+
   const [open, setOpen] = useState(true);
 
   const joinRoom = (room, isPublic = true) => {
-    if (!user._id) return;
-    socket.emit("join-room", room,currentRoom);
+    if (!user._id || !socket || socket === undefined) return;
+    socket.emit("join-room", room, currentRoom);
     dispatch(setCurrentRoom(room));
     if (isPublic) dispatch(setPrivateMemberMsg(null));
 
@@ -32,10 +33,6 @@ const Chat = () => {
     dispatch(resetNotifications(room));
   };
 
-  socket.off("notification").on("notification", (room) => {
-    if (room !== currentRoom) dispatch(addNotifications(room));
-  });
-
   const handlePrivateMember = (member) => {
     dispatch(setPrivateMemberMsg(member));
     const roomId = generateOrderId(user._id, member._id);
@@ -43,8 +40,13 @@ const Chat = () => {
   };
   useEffect(() => {
     // handleFunction(dispatch, profileUserRooms);
-    socket.emit('load-rooms',user._id)
-  }, []);
+    if (socket) {
+      socket.emit("load-rooms", user._id);
+      socket.off("notification").on("notification", (room) => {
+        if (room !== currentRoom) dispatch(addNotifications(room));
+      });
+    }
+  }, [socket]);
 
   return (
     <div className="flex max-h-screen ">
@@ -68,7 +70,7 @@ const Chat = () => {
           </div>
         </div>
         <ul className="pt-6">
-          <JoinRoom/>
+          <JoinRoom />
           <h3 className="text-md font-bold text-white">
             Rooms({rooms.length})
           </h3>
@@ -82,7 +84,11 @@ const Chat = () => {
                 className={`${
                   !open && "hidden"
                 } origin-left duration-200  btn w-full
-                ${room._id === currentRoom ? "text-white bg-accent" : "text-accent"}
+                ${
+                  room._id === currentRoom
+                    ? "text-white bg-accent"
+                    : "text-accent"
+                }
                 `}
               >
                 {room?.name}
@@ -101,46 +107,46 @@ const Chat = () => {
           </h3>
           {members.map((member, index) => {
             if (member._id !== user._id)
-            return (
-              <li
-                key={member._id}
-                className={`flex text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center justify-center  gap-x-4 px-4`}
-                onClick={() => handlePrivateMember(member)}
-              >
-                <span
-                  className={`${
-                    !open && "hidden"
-                  } origin-left duration-200 btn  w-full
+              return (
+                <li
+                  key={member._id}
+                  className={`flex text-lg rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300  items-center justify-center  gap-x-4 px-4`}
+                  onClick={() => handlePrivateMember(member)}
+                >
+                  <span
+                    className={`${
+                      !open && "hidden"
+                    } origin-left duration-200 btn  w-full
                     ${
                       member?._id === privateMemberMsg?._id
                         ? "btn btn-secondary"
                         : "btn-outline btn-secondary"
                     }
                     `}
-                >
-                  <div className={`avatar ${member.status} mx-4`}>
-                    <div className="w-9 rounded-full">
-                      <img src={member?.picture} alt={member.name} />
-                    </div>
-                  </div>
-                  <p className="mr-auto">{member.name}</p>
-                  {user.newMessages &&
-                    user?.newMessages[
-                      generateOrderId(member._id, user._id)
-                    ] && (
-                      <div className="indicator absolute top-[50%] right-10">
-                        <span className="indicator-item badge badge-accent">
-                          {
-                            user.newMessages[
-                              generateOrderId(member._id, user._id)
-                            ]
-                          }
-                        </span>
+                  >
+                    <div className={`avatar ${member.status} mx-4`}>
+                      <div className="w-9 rounded-full">
+                        <img src={member?.picture} alt={member.name} />
                       </div>
-                    )}
-                </span>
-              </li>
-            );
+                    </div>
+                    <p className="mr-auto">{member.name}</p>
+                    {user.newMessages &&
+                      user?.newMessages[
+                        generateOrderId(member._id, user._id)
+                      ] && (
+                        <div className="indicator absolute top-[50%] right-10">
+                          <span className="indicator-item badge badge-accent">
+                            {
+                              user.newMessages[
+                                generateOrderId(member._id, user._id)
+                              ]
+                            }
+                          </span>
+                        </div>
+                      )}
+                  </span>
+                </li>
+              );
           })}
         </ul>
       </div>

@@ -10,7 +10,7 @@ import { Home } from "./Components/Pages/Home";
 import Login from "./Components/Pages/Login";
 import Signup from "./Components/Pages/Signup";
 import PrivateRouteWrapper from "./Components/PrivateRouteWrapper";
-import { addMembers, setRooms, socket } from "./features/messageSlice";
+import { addMembers, checkMessageOfRoom, setRooms, setSocket } from "./features/messageSlice";
 import { loadID } from "./features/userSlice";
 import { useProfileUserMutation } from "./services/appApi";
 
@@ -26,25 +26,36 @@ const Layout = () => {
 const App = (props) => {
   const [profileUser] = useProfileUserMutation();
   const user = useSelector((state) => state.user);
+  const { socket ,currentRoom} = useSelector((state) => state.message);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(loadID());
     if (user._id) {
-      profileUser();
-      
-      socket.off("new-user").on("new-user", (payload) => {
+      profileUser().then((res) => {
+        dispatch(setSocket(res.data._id));
+      });
+    }
+  }, [user._id]);
+
+  useEffect(() =>
+  {
+    if (socket) {
+      socket.off("new-user").on("new-user", (payload) =>
+      {
+        
         dispatch(addMembers(payload));
       });
 
-      socket.off("rooms-loaded").on("rooms-loaded", async data =>
-      {
-        console.log(data)
+      socket.off("rooms-loaded").on("rooms-loaded", async (data) => {
+        console.log(data);
         const payload = { rooms: data, user: user._id };
-        dispatch(setRooms(payload))
-      })
-      
+        dispatch(setRooms(payload));
+        dispatch(checkMessageOfRoom())
+      });
+
+      socket.emit("new-user")
     }
-  }, [user._id]);
+  }, [socket]);
   return (
     <div>
       <Loader />

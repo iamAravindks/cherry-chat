@@ -9,6 +9,7 @@ import avatar from "../../assets/default.svg";
 import { uploadImg } from "../../utils/util";
 import Alert from "../Alert";
 import { setLoading } from "../../features/userSlice";
+import { setSocket } from "../../features/messageSlice";
 
 
 
@@ -16,14 +17,17 @@ const Signup = () =>
 {
   
   const user = useSelector((state) => state.user);
+  const {socket} = useSelector(state=>state.message)
   const dispatch = useDispatch()
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?._id) {
-      navigate("/");
-    }
-  }, [user?._id]);
+       if (user?._id) {
+         dispatch(setSocket());
+         if (socket) socket.emit("new-user");
+         navigate("/chat");
+       }
+  }, [user?._id,socket]);
 
   const initialState = {
     name: "",
@@ -83,7 +87,6 @@ const Signup = () =>
 
     setImgUpload(file);
   };
-
 
 
   return (

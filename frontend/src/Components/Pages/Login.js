@@ -1,57 +1,53 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import { BiLogInCircle } from 'react-icons/bi'
-import {useLoginUserMutation} from '../../services/appApi'
+import { BiLogInCircle } from "react-icons/bi";
+import { useLoginUserMutation } from "../../services/appApi";
 import Alert from "../Alert";
-import Img1 from '../../assets/img1.svg'
-import { socket } from "../../features/messageSlice";
+import Img1 from "../../assets/img1.svg";
+import { setSocket } from "../../features/messageSlice";
 
-
-const Login = () =>
-{
-  const navigate = useNavigate()
-
+const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  
- useEffect(() => {
-   if (user?._id)
-   {
-     socket.emit("new-user");
-     navigate("/chat");
-   }
- }, [user?._id]);
+  const { socket } = useSelector((state) => state.message);
 
-    const initialState = {
-        email: "",
-        password:""
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(setSocket());
+      if (socket) socket.emit("new-user");
+      navigate("/chat");
     }
-    const [formDetails, setFormDetails] = useState(initialState)
-  const [loginUser] = useLoginUserMutation()
-  
-    const onChangeHandler = (prop, val) =>
-    {
-        setFormDetails(prev =>
-        {
-            return {
-                ...prev,
-                [prop]:val
-            }
-        })
-    }
+  }, [user?._id,socket]);
 
-    const onSubmitHandler = async(e) =>
-    {
-      e.preventDefault()
-      const res = await loginUser(formDetails)
-      if(!res.error) navigate("/")
-    }
+  const initialState = {
+    email: "",
+    password: "",
+  };
+  const [formDetails, setFormDetails] = useState(initialState);
+  const [loginUser] = useLoginUserMutation();
+
+  const onChangeHandler = (prop, val) => {
+    setFormDetails((prev) => {
+      return {
+        ...prev,
+        [prop]: val,
+      };
+    });
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    const res = await loginUser(formDetails);
+    if (!res.error) navigate("/");
+  };
 
   return (
     <>
-      {user.error && <Alert>{ user.error}</Alert>}
+      {user.error && <Alert>{user.error}</Alert>}
       <section className="min-w-full min-h-screen p-2 flex flex-col justify-center items-center lg:flex-row">
         <div className="w-full min-h-[45vh] flex flex-col  justify-center items-center p-8">
           <img

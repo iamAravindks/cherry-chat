@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import SelectMembers from "./SelectMembers";
-import { socket } from "../features/messageSlice";
+
 import { useSelector } from "react-redux";
-import { getFormattedDate, getTime } from "../utils/util";
+
 
 const JoinRoom = () => {
   const [newRoomName, setNewRoomName] = useState("");
@@ -11,6 +11,7 @@ const JoinRoom = () => {
 
   const closeRef = useRef(null);
   const user = useSelector((state) => state.user);
+  const { socket } = useSelector((state) => state.message);
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,34 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { setMessages, socket } from "../features/messageSlice";
+import { setMessages } from "../features/messageSlice";
 import { getFormattedDate, getTime, getUser } from "../utils/util";
 import LeaveRoom from "./LeaveRoom";
 
 const MessageForm = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const { socket } = useSelector((state) => state.message);
 
   const scrollToBottom = (ref) =>
     ref.current?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
-    socket.off("room-messages").on("room-messages", async (roomMessages) => {
-      console.log(roomMessages);
-      if (roomMessages) dispatch(setMessages(roomMessages));
-    });
-  }, []);
+    if (socket) {
+      socket.off("room-messages").on("room-messages", async (roomMessages) => {
+        console.log(roomMessages);
+        if (roomMessages) dispatch(setMessages(roomMessages));
+      });
+    }
+  }, [socket]);
 
-  const user = useSelector((state) => state.user);
   const { currentRoom, messages, privateMemberMsg } = useSelector(
     (state) => state.message
   );
   const [currentMessage, setCurrentMessage] = useState("");
   const lastMsgRef = useRef();
-  const formRef = useRef(null)
+  const formRef = useRef(null);
   const todayDate = getFormattedDate();
   useEffect(() => {
     scrollToBottom(lastMsgRef);
-    scrollToBottom(formRef)
+    scrollToBottom(formRef);
   }, [messages]);
 
   const handleSubmit = (e) => {
@@ -74,9 +77,7 @@ const MessageForm = () => {
               </div>
             </>
           )}
-          {
-            currentRoom && <LeaveRoom/>
-          }
+          {(currentRoom && privateMemberMsg===null )&& <LeaveRoom />}
           {user._id &&
             currentRoom != null &&
             messages.map(({ _id: date, messageByDate }, idx) => (
@@ -117,37 +118,43 @@ const MessageForm = () => {
                       );
                     }
 
-                   return( <div
-                      class={`chat ${
-                        sender._id === user._id ? "chat-end" : "chat-start"
-                      }`}
-                    >
-                      <div class="chat-image avatar">
-                        <div class="w-10 rounded-full">
-                          <img src={sender.picture} alt={sender.name} />
-                        </div>
-                      </div>
-                      <div class="chat-header">
-                        {sender._id === user._id ? "You" : sender.name}
-                        <time class="text-xs opacity-50 mx-1">{time}</time>
-                      </div>
+                    return (
                       <div
-                        class={`chat-bubble ${
-                          sender._id === user._id
-                            ? "chat-bubble-primary"
-                            : "chat-bubble-secondary"
+                        class={`chat ${
+                          sender._id === user._id ? "chat-end" : "chat-start"
                         }`}
                       >
-                        {content}
+                        <div class="chat-image avatar">
+                          <div class="w-10 rounded-full">
+                            <img src={sender.picture} alt={sender.name} />
+                          </div>
+                        </div>
+                        <div class="chat-header">
+                          {sender._id === user._id ? "You" : sender.name}
+                          <time class="text-xs opacity-50 mx-1">{time}</time>
+                        </div>
+                        <div
+                          class={`chat-bubble ${
+                            sender._id === user._id
+                              ? "chat-bubble-primary"
+                              : "chat-bubble-secondary"
+                          }`}
+                        >
+                          {content}
+                        </div>
                       </div>
-                    </div>)
+                    );
                   }
                 )}
               </>
             ))}
           <div ref={lastMsgRef}></div>
         </div>
-        <form className="w-full  flex gap-1 " onSubmit={handleSubmit} ref={formRef}>
+        <form
+          className="w-full  flex gap-1 "
+          onSubmit={handleSubmit}
+          ref={formRef}
+        >
           <input
             type="text"
             placeholder="Type Your Message here.."

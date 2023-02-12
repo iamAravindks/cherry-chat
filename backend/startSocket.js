@@ -22,7 +22,12 @@ export const startSocket = (server) => {
     cors: config.CLIENT_CONNECTION,
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
+    const currConUser = await User.findById(socket.handshake.query._id).select(
+      "-password"
+    );
+
+    if (!currConUser) throw new Error("unauthorized");
     // Get new new user
     socket.on("new-user", async () => {
       const members = await User.find().select("-password");
@@ -102,8 +107,7 @@ export const startSocket = (server) => {
         const room = await Room.findOne({
           admin: mongoose.Types.ObjectId(member),
         });
-        if (room)
-        {
+        if (room) {
           await Room.deleteOne({ _id: roomId });
 
           const rooms = await getRooms();
@@ -151,10 +155,9 @@ export const startSocket = (server) => {
           let roomMessages = await getLastMessagesFromRoom(roomId);
           roomMessages = sortRoomMessagesByDate(roomMessages);
 
-
           // sending message to room
 
-          io.broadcast.to(roomId).emit("room-messages", roomMessages);
+          socket.broadcast.to(roomId).emit("room-messages", roomMessages);
 
           const rooms = await getRooms();
           socket.leave(roomId);
@@ -167,12 +170,15 @@ export const startSocket = (server) => {
     });
 
     // join chat
-    socket.on("join-room", async (newRoom, previousRoom) => {
+    socket.on("join-room", async (newRoom, previousRoom) =>
+    {
       socket.join(newRoom);
       socket.leave(previousRoom);
 
       let roomMessages = await getLastMessagesFromRoom(newRoom);
       roomMessages = sortRoomMessagesByDate(roomMessages);
+        console.log(roomMessages);
+
       socket.emit("room-messages", roomMessages);
     });
 

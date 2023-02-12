@@ -4,8 +4,6 @@ import msgApi from "../services/msgApi";
 
 const SOCKET_URL = "https://api-cherrychat.onrender.com";
 
-export const socket = io(SOCKET_URL);
-
 const endpoints = [msgApi.endpoints.profileUserRooms];
 
 export const messageSlice = createSlice({
@@ -18,6 +16,7 @@ export const messageSlice = createSlice({
     privateMemberMsg: {},
     newMessages: {},
     error: null,
+    socket: null,
   },
   reducers: {
     addMembers: (state, { payload }) => {
@@ -41,7 +40,26 @@ export const messageSlice = createSlice({
       });
       return { ...state, rooms: roomsWithUser };
     },
-
+    setSocket: (state, action) =>
+    {
+      console.log(action.payload)
+      return {
+        ...state,
+        socket:
+          (state.socket === null && action.payload)
+            ? io(SOCKET_URL, {
+                query: {
+                  _id: action?.payload,
+                },
+              })
+            : state.socket,
+      };
+    },
+    checkMessageOfRoom: (state) =>
+    {
+      const roomWithCurrMsg = state?.rooms.filter(room => room._id === state.currentRoom) 
+      if(roomWithCurrMsg.length===0) return {...state,messages:[]}
+    }
   },
   extraReducers: (builder) => {
     // your extra reducers go here
@@ -64,6 +82,7 @@ export const {
   setMessages,
   setPrivateMemberMsg,
   setRooms,
-  
+  setSocket,
+  checkMessageOfRoom,
 } = messageSlice.actions;
 export default messageSlice.reducer;
