@@ -7,7 +7,8 @@ const SelectMembers = ({
 }) => {
   const { members } = useSelector((state) => state.message);
   const user = useSelector((state) => state.user);
-  const handleMemberSelection = (member) => {
+
+  const handleMemberSelection = (member,name) => {
     const isMemberExist = selectedMembers.filter((m) => m._id === member);
     console.log(isMemberExist);
     if (isMemberExist.length) {
@@ -16,7 +17,7 @@ const SelectMembers = ({
     } else {
       setSelectedMembers([
         ...selectedMembers,
-        { _id: member, adminAccess: false },
+        { _id: member, adminAccess: false,name },
       ]);
       setSelectMembersID([...selectMembersID, member]);
     }
@@ -36,7 +37,7 @@ const SelectMembers = ({
                     ? "bg-secondary"
                     : "bg-primary"
                 }`}
-                onClick={() => handleMemberSelection(member._id)}
+                onClick={() => handleMemberSelection(member._id,member.name)}
               >
                 {member.name}
               </li>

@@ -42,7 +42,6 @@ export const messageSlice = createSlice({
     },
     setSocket: (state, action) =>
     {
-      console.log(action.payload)
       return {
         ...state,
         socket:

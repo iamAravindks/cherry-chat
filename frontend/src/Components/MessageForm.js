@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { setMessages } from "../features/messageSlice";
 import { setError } from "../features/userSlice";
 import { getFormattedDate, getTime, getUser } from "../utils/util";
 import LeaveRoom from "./LeaveRoom";
 import Alert from '../Components/Alert'
+import ShowMembers from './ShowMembers'
 
 const MessageForm = () => {
   const dispatch = useDispatch();
@@ -80,7 +80,12 @@ const MessageForm = () => {
               </div>
             </>
           )}
-          {currentRoom && !privateMemberMsg && <LeaveRoom />}
+          {currentRoom && !privateMemberMsg && (
+            <div className="w-full flex">
+              <LeaveRoom />
+              <ShowMembers/>
+            </div>
+          )}
           {!currentRoom && !privateMemberMsg && (
             <div className="alert shadow-lg">
               <div>
@@ -189,7 +194,7 @@ const MessageForm = () => {
           <button
             type="submit"
             className="btn btn-primary min-w-[10%]"
-            disabled={(!currentRoom && !privateMemberMsg)}
+            disabled={!currentRoom && !privateMemberMsg}
           >
             <FaTelegramPlane className="text-lg" />
           </button>

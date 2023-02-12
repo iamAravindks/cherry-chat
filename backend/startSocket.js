@@ -53,6 +53,7 @@ export const startSocket = (server) => {
         members: members.map((member) => ({
           user: member._id,
           adminAccess: member.adminAccess || false,
+          name:member.name
         })),
       });
 

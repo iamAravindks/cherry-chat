@@ -53,4 +53,10 @@ export const checkRoomAdmin = (rooms, roomId, userId) => {
   return roomWithAdmin.length > 0;
 };
 
+export const getMembers = (rooms, currentRoom) =>
+{
+  const mems = rooms.find(room => room._id === currentRoom)
+  return mems
+}
+
 

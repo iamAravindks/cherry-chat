@@ -47,7 +47,7 @@ const App = (props) => {
       });
 
       socket.off("rooms-loaded").on("rooms-loaded", async (data) => {
-        console.log("room",data);
+        
         const payload = { rooms: data, user: user._id };
         dispatch(setRooms(payload));
         dispatch(checkMessageOfRoom())
@@ -55,7 +55,6 @@ const App = (props) => {
             socket
               .off("room-messages")
               .on("room-messages", async (roomMessages) => {
-                console.log(roomMessages);
                 if (roomMessages) dispatch(setMessages(roomMessages));
               });
 

@@ -5,27 +5,33 @@ import { getMembers } from "../utils/util";
 const ShowMembers = () =>
 {
 
-    const {rooms,currentRoom} = useSelector(state=>state.message)
+  const { rooms, currentRoom } = useSelector(state => state.message)
+  const user = useSelector(state=>state.user)
     
-    const members = getMembers(rooms, currentRoom);
+  const members = getMembers(rooms, currentRoom);
   return (
     <div className="ml-auto">
       {/* The button to open modal */}
       <label htmlFor="my-modal-4" className="btn">
-        open modal
+        Members
       </label>
 
       {/* Put this part before </body> tag */}
       <input type="checkbox" id="my-modal-4" className="modal-toggle" />
       <label htmlFor="my-modal-4" className="modal cursor-pointer">
         <label className="modal-box relative" htmlFor="">
-          <h3 className="text-lg font-bold">
-            Members
-          </h3>
-          <p className="py-4">
-            You've been selected for a chance to get one year of subscription to
-            use Wikipedia for free!
-          </p>
+          <h3 className="text-lg font-bold">Members</h3>
+          <div className="py-4 flex flex-wrap gap-3">
+            <button  className="btn btn-success">
+              {user.name}
+            </button>
+
+            {members?.members.map((member) => (
+              <button key={member._id} className="btn btn-info">
+                {member.name}
+              </button>
+            ))}
+          </div>
         </label>
       </label>
     </div>
