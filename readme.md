@@ -1,4 +1,4 @@
-#cherry-chat
+# cherry-chat
 
 make sure your ```.env.example``` file have following 
 
