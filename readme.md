@@ -1,23 +1,32 @@
-# cherry-chat
-make sure 
+# Setting up the Cherry-Chat Development Environment
 
-the system installed nodejs
+## Prerequisites
+- Node.js must be installed on the system
+- `.env.example` file with the following variables:
+  1. MONGODB_URL
+  2. JWT_SECRET 
+  3. AUTH_COOKIE 
+  4. CLIENT_CONNECTION
 
-the ```.env.example``` file have the following 
+## Option 1: Instant Dev Set Up
+Run the following command in a bash shell (or you can use git bash shell) for an instant dev set up:
 
-1. MONGODB_URL
-2. JWT_SECRET 
-3. AUTH_COOKIE 
-4. CLIENT_CONNECTION 
-
-run ```./run.sh``` for instant dev set up or
+`./run.sh`
 
 follow these commands to set the dev env
 
-1. create a ```.env``` file and set the variables like ```.env.example```
-2. ```npm install```
-3. ```cd frontend && npm install```
-4. ```npm run dev```
-5. ```npm run client:dev```  or ```cd frontend && npm start```
 
-to set the MONGODB_URL , you can use either your mongodb localhost or use this as a demo db ```mongodb+srv://demouser:cherry-chat@cluster0.jwil72k.mongodb.net/?retryWrites=true&w=majority```
+## Option 2: Setting Up the Dev Environment Manually
+1. Create a `.env` file and set the variables, matching the values in `.env.example`
+2. Run the following command to install dependencies: `npm install`
+3. Go to the frontend directory and install its dependencies: `cd frontend && npm install`
+4. Back to root by `cd ..`, Start the dev environment : `npm run serve` 
+
+
+
+
+
+## Note
+To set the MONGODB_URL variable, you can either use your local MongoDB installation or use the following demo database URL:
+
+`mongodb+srv://demouser:cherry-chat@cluster0.jwil72k.mongodb.net/?retryWrites=true&w=majority`
