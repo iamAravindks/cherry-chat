@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import io from "socket.io-client";
 import msgApi from "../services/msgApi";
 
-const SOCKET_URL = "https://api-cherrychat.onrender.com";
+const SOCKET_URL = "http://localhost:5000";
 
 const endpoints = [msgApi.endpoints.profileUserRooms];
 
