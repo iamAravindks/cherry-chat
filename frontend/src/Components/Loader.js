@@ -6,7 +6,7 @@ const Loader = () => {
 
   if (loading) {
     return (
-      <div className="absolute bg-gray-800 top-0 left-0 min-h-screen min-w-full flex flex-col gap-2 items-center justify-center z-20 overflow-x-hidden">
+      <div className="absolute bg-gray-800 top-0 left-0 min-h-[110vh] min-w-full flex flex-col gap-2 items-center justify-center z-20 overflow-x-hidden">
         <svg
           xml="true"
           n="true"

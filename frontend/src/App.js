@@ -3,6 +3,7 @@ import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
 import "./App.css";
+import Footer from "./Components/Footer";
 import Loader from "./Components/Loader";
 import Navbar from "./Components/Navbar";
 import Chat from "./Components/Pages/Chat";
@@ -47,9 +48,10 @@ useEffect(() => {
     if (!memoizedSocket) return;
 
     memoizedSocket.emit("new-user");
+    memoizedSocket.emit("load-rooms", user._id);
+
 
     memoizedSocket.off("new-user").on("new-user", (payload) => {
-      console.log(payload);
       dispatch(addMembers(payload));
     });
 
@@ -84,6 +86,7 @@ useEffect(() => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
+      <Footer/>
     </div>
   );
 };

@@ -199,37 +199,16 @@ export const startSocket = (server) => {
 
       socket.broadcast.emit("notification", room);
     });
-    app.delete(
-      "/api/users/logout/:id",
-      expressAsyncHandler(async (req, res) => {
-        try {
-          const user = await User.findById(req.params.id);
-          if (user) {
-            user.status = "offline";
-            user.newMessages = newMessages;
-            await user.save();
-          }
+   
+    socket.on("fetch-room-admin", async (roomId) =>
+    {
+      const room = await Room.findOne({ _id: roomId })
+      if (!room) throw new Error("Room not found")
+      const admin = await room.admin
+      const adminName = await User.findById(admin)
 
-          const members = await User.find().select("-password");
-          socket.broadcast.emit("new-user", members);
-
-          const token = generateToken(
-            Math.floor(Math.random() * (1000000 - 100000) + 100000)
-          );
-          res.cookie(config.AUTH_COOKIE, token, {
-            httpOnly: true,
-            maxAge: 0,
-          });
-
-          res.json({
-            message: "successfully logout in",
-          });
-        } catch (error) {
-          res.status(400);
-          throw new Error(error.message);
-        }
-      })
-    );
+      socket.emit("fetch-room-admin",adminName.name);
+    });
 
     // set user to offline on logout
 

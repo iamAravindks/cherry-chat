@@ -117,7 +117,7 @@ const MessageForm = () => {
                   ({ content, time, from: sender, notification }, msgIdx) => {
                     if (notification) {
                       return (
-                        <div className="alert alert-ghost shadow-lg my-5 mx-auto w-[80%] h-[60px]">
+                        <div className="alert alert-ghost shadow-lg my-5 mx-auto w-[80%] h-[60px]" key={msgIdx}>
                           <div>
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -134,8 +134,8 @@ const MessageForm = () => {
                             </svg>
                             <span className="flex justify-center items-center gap-2">
                               {" "}
-                              <div class="chat-image avatar">
-                                <div class="w-10 rounded-full">
+                              <div className="chat-image avatar">
+                                <div className="w-10 rounded-full">
                                   <img src={sender.picture} alt={sender.name} />
                                 </div>
                               </div>
@@ -148,21 +148,21 @@ const MessageForm = () => {
 
                     return (
                       <div
-                        class={`chat ${
+                        className={`chat ${
                           sender._id === user._id ? "chat-end" : "chat-start"
                         }`}
                       >
-                        <div class="chat-image avatar">
-                          <div class="w-10 rounded-full">
+                        <div className="chat-image avatar">
+                          <div className="w-10 rounded-full">
                             <img src={sender.picture} alt={sender.name} />
                           </div>
                         </div>
-                        <div class="chat-header">
+                        <div className="chat-header">
                           {sender._id === user._id ? "You" : sender.name}
-                          <time class="text-xs opacity-50 mx-1">{time}</time>
+                          <time className="text-xs opacity-50 mx-1">{time}</time>
                         </div>
                         <div
-                          class={`chat-bubble ${
+                          className={`chat-bubble ${
                             sender._id === user._id
                               ? "chat-bubble-primary"
                               : "chat-bubble-secondary"
