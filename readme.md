@@ -1,6 +1,9 @@
 # cherry-chat
+make sure 
 
-make sure your ```.env.example``` file have following 
+the system installed nodejs
+
+the ```.env.example``` file have the following 
 
 1. MONGODB_URL
 2. JWT_SECRET 
