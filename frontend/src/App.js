@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
 import "./App.css";
@@ -26,7 +26,8 @@ const Layout = () => {
 const App = (props) => {
   const [profileUser] = useProfileUserMutation();
   const user = useSelector((state) => state.user);
-  const { socket ,currentRoom} = useSelector((state) => state.message);
+  const { socket, currentRoom } = useSelector((state) => state.message);
+  const memoizedSocket = useMemo(() => socket, [socket]);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(loadID());
@@ -37,32 +38,39 @@ const App = (props) => {
     }
   }, [user._id]);
 
-  useEffect(() =>
-  {
-    if (socket) {
-      socket.off("new-user").on("new-user", (payload) =>
-      {
-        console.log(payload)
-        dispatch(addMembers(payload));
+useEffect(() => {
+  dispatch(loadID());
+  if (!user._id) return;
+
+  profileUser().then((res) => {
+    dispatch(setSocket(res.data._id));
+    if (!memoizedSocket) return;
+
+    memoizedSocket.emit("new-user");
+
+    memoizedSocket.off("new-user").on("new-user", (payload) => {
+      console.log(payload);
+      dispatch(addMembers(payload));
+    });
+
+    memoizedSocket.off("rooms-loaded").on("rooms-loaded", async (data) => {
+      const payload = { rooms: data, user: user._id };
+      dispatch(setRooms(payload));
+      dispatch(checkMessageOfRoom());
+    });
+
+    memoizedSocket
+      .off("room-messages")
+      .on("room-messages", async (roomMessages) => {
+        if (roomMessages) dispatch(setMessages(roomMessages));
       });
 
-      socket.off("rooms-loaded").on("rooms-loaded", async (data) => {
-        
-        const payload = { rooms: data, user: user._id };
-        dispatch(setRooms(payload));
-        dispatch(checkMessageOfRoom())
-      });
-            socket
-              .off("room-messages")
-              .on("room-messages", async (roomMessages) => {
-                if (roomMessages) dispatch(setMessages(roomMessages));
-              });
-      socket.off("notification").on("notification", (room) => {
-        if (room !== currentRoom) dispatch(addNotifications(room));
-      });
-      socket.emit("new-user")
-    }
-  }, [socket]);
+    memoizedSocket.off("notification").on("notification", (room) => {
+      if (room !== currentRoom) dispatch(addNotifications(room));
+    });
+  });
+}, [user._id, memoizedSocket]);
+
   return (
     <div>
       <Loader />
