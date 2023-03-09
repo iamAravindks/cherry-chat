@@ -3,7 +3,7 @@ import expressAsyncHandler from "express-async-handler";
 import { isAuth } from "../middlewares/authMiddleware.js";
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
-import config from '../config.js'
+import config from "../config.js";
 import Room from "../models/RoomModel.js";
 const userRouter = express.Router();
 
@@ -123,10 +123,10 @@ userRouter.put(
 
 userRouter.delete(
   "/logout",
-  isAuth,
   expressAsyncHandler(async (req, res) => {
     const token = generateToken(
-      Math.floor(Math.random() * (1000000 - 100000) + 100000));
+      Math.floor(Math.random() * (1000000 - 100000) + 100000)
+    );
     res.cookie(config.AUTH_COOKIE, token, {
       httpOnly: true,
       maxAge: 0,
@@ -138,20 +138,18 @@ userRouter.delete(
   })
 );
 
-
 // @desc Get the rooms of that particular users
 // @route GET /api/users/rooms
 // @access PRIVATE
 const rooms = ["crypto", "web3", "linux", "UI/UX"];
 
-
 userRouter.get(
   "/rooms",
-  expressAsyncHandler(async(req, res) => {
+  expressAsyncHandler(async (req, res) => {
     // res.status(401).json({message:"haha"})
 
     const rooms = await Room.find();
-    res.status(200).json(rooms)
+    res.status(200).json(rooms);
   })
 );
 

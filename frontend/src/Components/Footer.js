@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react";
 
 const Footer = () => {
   return (
-    <div className="  flex text-right justify-end items-center gap-1 mr-2 ml-2 my-1">
+    <div className="  flex text-right justify-end items-center gap-1 mr-2 ml-2 my-1 max-h-[20px]">
       {" "}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -20,6 +20,6 @@ const Footer = () => {
       If you encounter any issues,please refresh the page
     </div>
   );
-}
+};
 
-export default Footer
+export default Footer;

@@ -11,7 +11,13 @@ import { Home } from "./Components/Pages/Home";
 import Login from "./Components/Pages/Login";
 import Signup from "./Components/Pages/Signup";
 import PrivateRouteWrapper from "./Components/PrivateRouteWrapper";
-import { addMembers, checkMessageOfRoom, setMessages, setRooms, setSocket } from "./features/messageSlice";
+import {
+  addMembers,
+  checkMessageOfRoom,
+  setMessages,
+  setRooms,
+  setSocket,
+} from "./features/messageSlice";
 import { addNotifications, loadID } from "./features/userSlice";
 import { useProfileUserMutation } from "./services/appApi";
 
@@ -39,55 +45,56 @@ const App = (props) => {
     }
   }, [user._id]);
 
-useEffect(() => {
-  dispatch(loadID());
-  if (!user._id) return;
+  useEffect(() => {
+    dispatch(loadID());
+    if (!user._id) return;
 
-  profileUser().then((res) => {
-    dispatch(setSocket(res.data._id));
-    if (!memoizedSocket) return;
+    profileUser().then((res) => {
+      dispatch(setSocket(res.data._id));
+      if (!memoizedSocket) return;
 
-    memoizedSocket.emit("new-user");
-    memoizedSocket.emit("load-rooms", user._id);
+      memoizedSocket.emit("new-user");
+      memoizedSocket.emit("load-rooms", user._id);
 
-
-    memoizedSocket.off("new-user").on("new-user", (payload) => {
-      dispatch(addMembers(payload));
-    });
-
-    memoizedSocket.off("rooms-loaded").on("rooms-loaded", async (data) => {
-      const payload = { rooms: data, user: user._id };
-      dispatch(setRooms(payload));
-      dispatch(checkMessageOfRoom());
-    });
-
-    memoizedSocket
-      .off("room-messages")
-      .on("room-messages", async (roomMessages) => {
-        if (roomMessages) dispatch(setMessages(roomMessages));
+      memoizedSocket.off("new-user").on("new-user", (payload) => {
+        dispatch(addMembers(payload));
       });
 
-    memoizedSocket.off("notification").on("notification", (room) => {
-      if (room !== currentRoom) dispatch(addNotifications(room));
+      memoizedSocket.off("rooms-loaded").on("rooms-loaded", async (data) => {
+        const payload = { rooms: data, user: user._id };
+        dispatch(setRooms(payload));
+        dispatch(checkMessageOfRoom());
+      });
+
+      memoizedSocket
+        .off("room-messages")
+        .on("room-messages", async (roomMessages) => {
+          if (roomMessages) dispatch(setMessages(roomMessages));
+        });
+
+      memoizedSocket.off("notification").on("notification", (room) => {
+        if (room !== currentRoom) dispatch(addNotifications(room));
+      });
     });
-  });
-}, [user._id, memoizedSocket]);
+  }, [user._id, memoizedSocket]);
 
   return (
-    <div>
-      <Loader />
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route element={<PrivateRouteWrapper />}>
-            <Route index element={<Home />} />
-            <Route path="/chat" element={<Chat />} />
+    <>
+      <div className="min-h-[97vh]">
+        <Loader />
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route element={<PrivateRouteWrapper />}>
+              <Route index element={<Home />} />
+              <Route path="/chat" element={<Chat />} />
+            </Route>
           </Route>
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-      <Footer/>
-    </div>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </div>
+      <Footer />
+    </>
   );
 };
 export default App;

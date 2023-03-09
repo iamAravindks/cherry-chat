@@ -9,7 +9,7 @@ import {
   setCurrentRoom,
   setPrivateMemberMsg,
 } from "../../features/messageSlice";
-import {  resetNotifications } from "../../features/userSlice";
+import { resetNotifications } from "../../features/userSlice";
 import JoinRoom from "../JoinRoom";
 
 const Chat = () => {
@@ -27,7 +27,6 @@ const Chat = () => {
     socket.emit("join-room", room, currentRoom);
     dispatch(setCurrentRoom(room));
     if (isPublic) dispatch(setPrivateMemberMsg(null));
-
 
     // dispatch for notifications
 
@@ -47,11 +46,11 @@ const Chat = () => {
   }, [socket]);
 
   return (
-    <div className="flex max-h-screen ">
+    <div className="flex max-h-screen relative">
       <div
         className={` ${
           open ? "w-[20rem]" : "w-24 "
-        } bg-gray-800 max-h-screen p-5  pt-8 relative duration-300 overflow-y-scroll`}
+        } bg-gray-800 max-h-screen p-5  pt-8  duration-300 overflow-y-scroll relative min-h-[calc(100vh+25px)] z-10`}
       >
         <SlArrowLeft
           className={`absolute cursor-pointer right-2 top-9 w-7 h-7 p-1 text-lg bg-purple-600

@@ -199,20 +199,20 @@ export const startSocket = (server) => {
 
       socket.broadcast.emit("notification", room);
     });
-   
-    socket.on("fetch-room-admin", async (roomId) =>
-    {
-      const room = await Room.findOne({ _id: roomId })
-      if (!room) throw new Error("Room not found")
-      const admin = await room.admin
-      const adminName = await User.findById(admin)
 
-      socket.emit("fetch-room-admin",adminName.name);
+    socket.on("fetch-room-admin", async (roomId) => {
+      const room = await Room.findOne({ _id: roomId });
+      if (!room) throw new Error("Room not found");
+      const admin = await room.admin;
+      const adminName = await User.findById(admin);
+
+      socket.emit("fetch-room-admin", adminName.name);
     });
 
     // set user to offline on logout
 
-    socket.on("set-status", async (_id,status) => {
+    socket.on("set-status", async (_id, status) => {
+      console.log(_id);
       try {
         const user = await User.findById(_id);
         if (user) {
@@ -221,18 +221,11 @@ export const startSocket = (server) => {
           const members = await User.find().select("-password");
           socket.broadcast.emit("new-user", members);
         }
-
-      } catch (error)
-      {
-        console.log(error)
-        throw new Error("Not allowed")
+      } catch (error) {
+        console.log(error);
+        throw new Error("Not allowed");
       }
     });
-
-
-
-
-
 
     socket.on("error", (error) => {
       console.error("Socket error:", error);

@@ -18,15 +18,14 @@ const Login = () => {
   useEffect(() => {
     if (user?._id) {
       dispatch(setSocket());
-      if (socket)
-      {
-        socket.emit("new-user")
-        socket.emit("set-status",user._id,"online")
-      socket.emit("load-rooms",user._id)
-      };
-      navigate("/chat");
+      if (socket) {
+        socket.emit("new-user");
+        socket.emit("set-status", user._id, "online");
+        socket.emit("load-rooms", user._id);
+        navigate("/chat");
+      }
     }
-  }, [user?._id,socket]);
+  }, [user?._id, socket]);
 
   const initialState = {
     email: "",
@@ -47,7 +46,6 @@ const Login = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const res = await loginUser(formDetails);
-    if (!res.error) navigate("/");
   };
 
   return (
